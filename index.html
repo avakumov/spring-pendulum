@@ -1,0 +1,88 @@
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+
+    <title>Пружинный маятник</title>
+
+    <link rel="stylesheet" href="css/styles.css" />
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.min.js"
+      integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+      crossorigin="anonymous"
+    ></script>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="view paper">
+        <div class="title">Визуализация:</div>
+        <canvas id="canvas" width="300" height="500"></canvas>
+        <button class="btn" id="start-stop-button">Старт</button>
+      </div>
+      <div class="sidebar">
+        <div class="params paper">
+          <div class="title">Параметры:</div>
+          <div class="params__item">
+            <p>Масса груза(<em>m</em>):</p>
+            <input
+              type="range"
+              min="0.5"
+              max="1"
+              value="0.5"
+              step="0.1"
+              class="slider"
+              id="m-input"
+            />
+            <div><span id="m-current">0.5</span> кг.</div>
+          </div>
+          <div class="params__item">
+            <p>Жесткость пружины(<em>&kappa;</em>):</p>
+            <input
+              type="range"
+              min="5"
+              max="9"
+              value="5"
+              step="1"
+              class="slider"
+              id="k-input"
+            />
+            <div><span id="k-current">5</span> Н/м.</div>
+          </div>
+          <div class="params__item">
+            <p>
+              Первоночальное отклонение(<em></em>x<sub><em>0</em></sub
+              >):
+            </p>
+            <input
+              type="range"
+              min="0"
+              max="20"
+              value="10"
+              step="2"
+              class="slider"
+              id="x0-input"
+            />
+            <div><span id="x0-current">10</span> см.</div>
+          </div>
+        </div>
+        <div class="results paper">
+          <div class="title">Характеристики:</div>
+          <div class="results__item">
+            Циклическая частота(<em></em>&omega;<sub><em>0</em></sub
+            >): <span id="w0-var"></span> 1/с
+          </div>
+          <div class="results__item">
+            Время(<em>t</em>): <span id="t-var"></span> c
+          </div>
+          <div class="results__item">
+            Количество колебаний(<em>n</em>): <span id="n-var"></span>
+          </div>
+          <div class="results__item">
+            Отклонение от равновесия(<em>x</em>): <span id="x-var"></span> см
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="js/scripts.js"></script>
+  </body>
+</html>
