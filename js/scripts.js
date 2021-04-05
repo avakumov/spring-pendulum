@@ -1,115 +1,136 @@
 //Переменные логики
-let interval;
-let isRunning = false;
-//выставлять в интервале 0.05-0.2
-const animationInterval = 0.1;
+const logic = {
+  interval: null,
+  isRunning: false,
+  //выставлять в интервале 0.05-0.2
+  animationInterval: 0.1,
+};
 
 //Физические переменные
-let t = 0;
-let k = 0;
-let m = 0;
-let w0 = 0;
-let x0 = 0;
-let x = 0;
-let n = 0;
+const phys = {
+  t: 0,
+  k: 0,
+  m: 0,
+  w0: 0,
+  x0: 0,
+  x: 0,
+  n: 0,
+  fixedTime: 0,
+};
 
-//переменная используются для подсчета количества колебаний
-let fixedTime = 0;
+const selectors = {
+  //приводятся к виду селекторов: х+"-input", x+"-current",
+  //!!!!!!должны совпадать с названиями физических переменных!!!!!!!
+  inputs: ["m", "k", "x0"],
+  //вывод переменных с округлением приводятся к виду селектора: х.value+"-var"
+  //!!!!!!должны совпадать с названиями физических переменных!!!!!!!
+  specs: [
+    { value: "w0", fixed: 2 },
+    { value: "t", fixed: 1 },
+    { value: "n", fixed: 0 },
+    { value: "x", fixed: 2 },
+  ],
+  startStop: "#start-stop-button",
+  canvas: "#canvas",
+};
 
 //получение контекста канваса
-const canvas = $("#canvas")[0];
+const canvas = $(selectors.canvas)[0];
 const ctx = canvas.getContext("2d");
 
 //общее обновление
-update();
+update(logic.isRunning, phys, selectors);
 
 //добавление слушателей
-addListeners();
+addListeners(logic, phys, selectors);
 
 //функция запуска, остановки анимации
-function startStopAnimation() {
-  isRunning = !isRunning;
-  $("#start-stop-button").text(isRunning ? "Stop" : "Play");
-  disableEnableInputs();
-
+function startStopAnimation(logic, phys, selectors) {
+  logic.isRunning = !logic.isRunning;
+  $(selectors.startStop).text(logic.isRunning ? "Stop" : "Play");
+  disableEnableInputs(logic.isRunning, selectors.inputs);
   //остановка анимации
-  if (!isRunning) {
-      update()
-      return clearInterval(interval);
+  if (!logic.isRunning) {
+    update(logic.isRunning, phys, selectors);
+    return clearInterval(logic.interval);
   }
 
   //запуск анимации
-  interval = setInterval(animate, animationInterval * 1000);
+  logic.interval = setInterval(
+    () => animate(logic, phys, selectors),
+    logic.animationInterval * 1000
+  );
 }
 //Функция анимации
-function animate() {
-  t += animationInterval;
-  update();
-  counter();
+function animate(logic, phys, selectors) {
+  phys.t += logic.animationInterval;
+  update(logic.isRunning, phys, selectors);
+  counter(phys);
 }
 
 //функция подсчета количества колебаний
-function counter() {
+function counter(phys) {
   //условие протестировано для animationInterval в интервале 0.05-0.2
-  if (x0 - x < 1 && t - fixedTime > 0.8) {
-    n++;
-    fixedTime = t;
+  if (phys.x0 - phys.x < 1 && phys.t - phys.fixedTime > 0.8) {
+    phys.n++;
+    phys.fixedTime = phys.t;
   }
 }
 
-function addListeners() {
+function addListeners(logic, phys, selectors) {
   //старт, стоп анимации
-  $("#start-stop-button").click(startStopAnimation);
+  $(selectors.startStop).click(() =>
+    startStopAnimation(logic, phys, selectors)
+  );
 
   //обработчики на инпуты
-  ["m", "k", "x0"].forEach((physVar) => {
+  selectors.inputs.forEach((physVar) => {
     $(`#${physVar}-input`).on("input", function (e) {
       $(`#${physVar}-current`).text($(e.target).val());
-      update();
+      update(logic.isRunning, phys, selectors);
     });
   });
 }
 
 //функция отключения/включения инпутов
-function disableEnableInputs() {
-  ["m", "k", "x0"].forEach((physVar) => {
+function disableEnableInputs(isRunning, inputs) {
+  inputs.forEach((physVar) => {
     $(`#${physVar}-input`).prop("disabled", isRunning);
   });
 }
 
 //функция общего обновления
-function update() {
-  updatePhysicalVars();
-  updateSpecifications();
-  updateView();
+function update(isRunning, phys, selectors) {
+  updatePhysicalVars(isRunning, phys, selectors.inputs);
+  updateSpecifications(phys, selectors.specs);
+  updateView(phys);
 }
 
 //функция обновления физических переменных
-function updatePhysicalVars() {
+function updatePhysicalVars(isRunning, phys, inputs) {
   if (isRunning) {
-    x = Math.cos(w0 * t) * x0;
+    phys.x = Math.cos(phys.w0 * phys.t) * phys.x0;
   } else {
-    t = 0;
-    k = Number($("#k-input").val());
-    m = Number($("#m-input").val());
-    x0 = Number($("#x0-input").val());
-    w0 = Math.sqrt(k / m);
-    x = Math.cos(w0 * t) * x0;
-    n = 0;
-    fixedTime = 0;
+    phys.t = 0;
+    inputs.forEach(
+      (physVar) => (phys[physVar] = Number($(`#${physVar}-input`).val()))
+    );
+    phys.w0 = Math.sqrt(phys.k / phys.m);
+    phys.x = Math.cos(phys.w0 * phys.t) * phys.x0;
+    phys.n = 0;
+    phys.fixedTime = 0;
   }
 }
 
 //функция обновления характеристик
-function updateSpecifications() {
-  $("#w0-var").text(w0.toFixed(2));
-  $("#t-var").text(t.toFixed(1));
-  $("#n-var").text(n);
-  $("#x-var").text(x.toFixed(2));
+function updateSpecifications(p, specs) {
+  specs.forEach((spec) =>
+    $(`#${spec.value}-var`).text(p[spec.value].toFixed(spec.fixed))
+  );
 }
 
 //функция обновления визуализации
-function updateView() {
+function updateView({ x, m }) {
   //очистить предыдущий рендер
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
