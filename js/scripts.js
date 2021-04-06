@@ -22,9 +22,9 @@ const selectors = {
   //приводятся к виду селекторов: х+"-input", x+"-current",
   //!!!!!!должны совпадать с названиями физических переменных!!!!!!!
   inputs: ["m", "k", "x0"],
-  //вывод переменных с округлением приводятся к виду селектора: х.value+"-var"
+  //вывод переменных с округлением приводятся к виду селектора: х.value+"-output"
   //!!!!!!должны совпадать с названиями физических переменных!!!!!!!
-  specs: [
+  outputs: [
     { value: "w0", fixed: 2 },
     { value: "t", fixed: 1 },
     { value: "n", fixed: 0 },
@@ -102,7 +102,7 @@ function disableEnableInputs(isRunning, inputs) {
 //функция общего обновления
 function update(isRunning, phys, selectors) {
   updatePhysicalVars(isRunning, phys, selectors.inputs);
-  updateSpecifications(phys, selectors.specs);
+  updateSpecifications(phys, selectors.outputs);
   updateView(phys);
 }
 
@@ -123,9 +123,9 @@ function updatePhysicalVars(isRunning, phys, inputs) {
 }
 
 //функция обновления характеристик
-function updateSpecifications(p, specs) {
-  specs.forEach((spec) =>
-    $(`#${spec.value}-var`).text(p[spec.value].toFixed(spec.fixed))
+function updateSpecifications(p, outputs) {
+  outputs.forEach((output) =>
+    $(`#${output.value}-output`).text(p[output.value].toFixed(output.fixed))
   );
 }
 
