@@ -19,10 +19,12 @@ const phys = {
 };
 
 const selectors = {
-  //приводятся к виду селекторов: х+"-input", x+"-current",
+  
+  //приводятся к виду селекторов: "#"+х+"-input", "#"+x+"-current",
   //!!!!!!должны совпадать с названиями физических переменных!!!!!!!
   inputs: ["m", "k", "x0"],
-  //вывод переменных с округлением приводятся к виду селектора: х.value+"-output"
+
+  //вывод переменных с округлением приводятся к виду селектора: "#"+х.value+"-output"
   //!!!!!!должны совпадать с названиями физических переменных!!!!!!!
   outputs: [
     { value: "w0", fixed: 2 },
@@ -49,6 +51,7 @@ function startStopAnimation(logic, phys, selectors) {
   logic.isRunning = !logic.isRunning;
   $(selectors.startStop).text(logic.isRunning ? "Stop" : "Play");
   disableEnableInputs(logic.isRunning, selectors.inputs);
+
   //остановка анимации
   if (!logic.isRunning) {
     update(logic.isRunning, phys, selectors);
@@ -61,6 +64,7 @@ function startStopAnimation(logic, phys, selectors) {
     logic.animationInterval * 1000
   );
 }
+
 //Функция анимации
 function animate(logic, phys, selectors) {
   phys.t += logic.animationInterval;
@@ -123,9 +127,9 @@ function updatePhysicalVars(isRunning, phys, inputs) {
 }
 
 //функция обновления характеристик
-function updateSpecifications(p, outputs) {
+function updateSpecifications(phys, outputs) {
   outputs.forEach((output) =>
-    $(`#${output.value}-output`).text(p[output.value].toFixed(output.fixed))
+    $(`#${output.value}-output`).text(phys[output.value].toFixed(output.fixed))
   );
 }
 
